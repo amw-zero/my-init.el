@@ -1,4 +1,4 @@
-; Backspace wasn't working
+'; Backspace wasn't working
 ;(global-set-key (kbd "C-h") 'delete-backward-char)
 
 ; TABS UGH!
@@ -8,7 +8,6 @@
 (add-to-list 'load-path "/home/zero/code/LISP/slime-2013-04-02")  ; your SLIME directory
 (require 'slime)
 (slime-setup)
-
 
 (defun clear-shell ()
   (interactive)
