@@ -1,4 +1,4 @@
-'; Backspace wasn't working
+; Backspace wasn't working
 ;(global-set-key (kbd "C-h") 'delete-backward-char)
 
 ; TABS UGH!
