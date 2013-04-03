@@ -14,6 +14,7 @@
   (interactive)
   (progn (setq comint-buffer-maximum-size 0)
 	 (comint-truncate-buffer)))
+
 (global-set-key (kbd "C-c c") `clear-shell)
 
 (tool-bar-mode -1)
