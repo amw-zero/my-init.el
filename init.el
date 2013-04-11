@@ -9,6 +9,22 @@
 (require 'slime)
 (slime-setup)
 
+
+;;; IBuffer -- add any file to a filter group. still neds work
+
+; Can add any file to Current filter group
+; however, I don't like the (or ... (or ... (or ... ))) thing. 
+; There should be a better way to do this.
+(defun test-add-to-current-filter-group ()
+  (interactive)
+  (if (string= "Current" (caar ibuffer-filter-groups))
+	  (setf (nth 1 (car ibuffer-filter-groups)) `(or (name . ,(buffer-name (ibuffer-current-buffer))) 
+													 ,(cadr (assoc "Current" ibuffer-filter-groups))))
+	  (push `("Current" (name . ,(buffer-name (ibuffer-current-buffer)))) ibuffer-filter-groups))
+  (ibuffer-update nil t))
+
+(global-set-key (kbd "C-c A") `test-add-to-current-filter-group)
+
 (defun clear-shell ()
   (interactive)
   (progn (setq comint-buffer-maximum-size 0)
