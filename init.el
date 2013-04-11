@@ -10,7 +10,7 @@
 (slime-setup)
 
 
-;;; IBuffer -- add any file to a filter group. still neds work
+;;; IBuffer -- add any file to a filter group. still needs work
 
 ; Can add any file to Current filter group
 ; however, I don't like the (or ... (or ... (or ... ))) thing. 
