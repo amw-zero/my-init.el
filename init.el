@@ -31,6 +31,16 @@
 	    ibuffer-filter-groups)))
   (ibuffer-update nil t))
 
+(defun test-add-marked-buffers-to-filter-group (group-name)
+  (interactive "sName of filter group to add to: ")
+  (push `(,group-name ,(macroexpand `(my-or ,(gen-qualifiers (ibuffer-get-marked-buffers))))) 
+		ibuffer-filter-groups)
+  (ibuffer-update nil t))
+
+; Have to manually eval-last-sexp this
+(defmacro my-or (qualifiers)
+		 `(or ,@qualifiers))
+
 ; doesn't work:
 (defun ibuffer-add-marked-buffers-to-filter-group (group-name)
   (interactive "sName of filter group to move to: ")
