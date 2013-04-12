@@ -31,6 +31,21 @@
 	    ibuffer-filter-groups)))
   (ibuffer-update nil t))
 
+; doesn't work:
+(defun ibuffer-add-marked-buffers-to-filter-group (group-name)
+  (interactive "sName of filter group to move to: ")
+  (let ((filter-group (assoc group-name ibuffer-filter-groups)))
+    (if filter-group
+	(dolist (marked-buffer (ibuffer-get-marked-buffers))
+	  (setf (cadr filter-group)
+		`(or (name . ,(buffer-name marked-buffer))
+		     ,(cadr filter-group))))
+      (dolist (marked-buffer (ibuffer-get-marked-buffers))
+	(push `(,group-name (name . ,(buffer-name marked-buffer)))
+		ibuffer-filter-groups))))
+  (ibuffer-update nil t))
+
+
 (add-hook `ibuffer-mode-hook
 	  `(lambda ()
 	     (progn
