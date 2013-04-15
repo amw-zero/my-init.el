@@ -20,8 +20,11 @@
 (require 'expand-region)
 (global-set-key (kbd "C-=") 'er/expand-region)
 
-
 ;;;; My Ibuffer extensions
+(setq ibuffer-show-empty-filter-groups nil)
+(setq ibuffer-auto-mode t)
+(setq ibuffer-expert t)
+
 (defun open-ibuffer ()
   (interactive)
   (split-window-below)
