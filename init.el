@@ -4,11 +4,24 @@
 ; TABS UGH!
 ;(global-set-key "\t" 'self-insert-command)
 ;(setq tab-width 2) 
-(setq inferior-lisp-program "/usr/bin/sbcl") ; your Lisp system
-(add-to-list 'load-path "/home/zero/code/LISP/slime-2013-04-02")  ; your SLIME directory
-(require 'slime)
-(slime-setup)
 
+;; (setq inferior-lisp-program "/usr/bin/sbcl") ; your Lisp system
+;; (add-to-list 'load-path "/home/zero/code/LISP/slime-2013-04-02")  ; your SLIME directory
+;; (require 'slime)
+;; (slime-setup)
+
+; Multiple cursors
+(add-to-list 'load-path "multiple-cursors")
+(require 'multiple-cursors)
+(global-set-key (kbd "C-c n") 'mc/mark-all-like-this)
+
+;; Expand-region
+(add-to-list 'load-path "expand-region.el")
+(require 'expand-region)
+(global-set-key (kbd "C-=") 'er/expand-region)
+
+
+;;;; My Ibuffer extensions
 (defun open-ibuffer ()
   (interactive)
   (split-window-below)
@@ -17,50 +30,55 @@
   (shrink-window-if-larger-than-buffer))
 (global-set-key (kbd "C-x C-b") 'open-ibuffer)
 
+;; Collapse all buffer groups
+(defun ibuffer-toggle-all-filter-groups ()
+  "Toggle the display status of all filter groups"
+  (interactive)
+  (setq ibuffer-hidden-filter-groups 
+        (loop for group in (ibuffer-current-filter-groups-with-position)
+	      collect (car group)))
+  (ibuffer-update nil t))
 
-;;; IBuffer -- add any file to a filter group. still needs work
-(defun ibuffer-buffer-to-filter-group (group-name)
-  "Add buffer at point to filter-group"
-  (interactive "sName of filter group to move to: ")
+(defun push-to-filter-group (group-name buffer-list)
+  (push `(,group-name ,(macroexpand `(multi-or ,buffer-list)))
+	ibuffer-filter-groups))
+
+(defun add-to-filter-group (group-name buffer-list)
   (let ((filter-group (assoc group-name ibuffer-filter-groups)))
     (if filter-group
-	(setf (cadr filter-group)
-	      `(or (name . ,(buffer-name (ibuffer-current-buffer)))
-		   ,(cadr filter-group)))
-      (push `(,group-name (name . ,(buffer-name (ibuffer-current-buffer))))
-	    ibuffer-filter-groups)))
+	(if (string= "or" (caadr filter-group))
+	    (setf (cadr filter-group)
+		  (macroexpand `(multi-or ,(append (cdadr filter-group) buffer-list))))
+	    (setf (cadr filter-group)
+		  (macroexpand `(multi-or ,(append (list (cadr filter-group)) buffer-list)))))
+      (push-to-filter-group group-name buffer-list))))
+
+(defun ibuffer-marked-buffers-to-filter-group (group-name)
+  "Add all marked buffers to a filter-group"
+  (interactive "sName of filter group to add to: ")
+  (add-to-filter-group group-name (gen-qualifiers (ibuffer-get-marked-buffers)))
+  (ibuffer-unmark-all ibuffer-marked-char)
   (ibuffer-update nil t))
 
-(defun test-add-marked-buffers-to-filter-group (group-name)
-  (interactive "sName of filter group to add to: ")
-  (push `(,group-name ,(macroexpand `(my-or ,(gen-qualifiers (ibuffer-get-marked-buffers))))) 
-		ibuffer-filter-groups)
-  (ibuffer-update nil t))
+(defun gen-qualifiers (buffers)
+  (loop for buf in buffers
+	collect (cons 'name (buffer-name buf))))
 
 ; Have to manually eval-last-sexp this
-(defmacro my-or (qualifiers)
+(defmacro multi-or (qualifiers)
 		 `(or ,@qualifiers))
-
-; doesn't work:
-(defun ibuffer-add-marked-buffers-to-filter-group (group-name)
-  (interactive "sName of filter group to move to: ")
-  (let ((filter-group (assoc group-name ibuffer-filter-groups)))
-    (if filter-group
-	(dolist (marked-buffer (ibuffer-get-marked-buffers))
-	  (setf (cadr filter-group)
-		`(or (name . ,(buffer-name marked-buffer))
-		     ,(cadr filter-group))))
-      (dolist (marked-buffer (ibuffer-get-marked-buffers))
-	(push `(,group-name (name . ,(buffer-name marked-buffer)))
-		ibuffer-filter-groups))))
-  (ibuffer-update nil t))
-
 
 (add-hook `ibuffer-mode-hook
 	  `(lambda ()
 	     (progn
 	       (define-key ibuffer-mode-map "a" `ibuffer-buffer-to-filter-group)
+	       (define-key ibuffer-mode-map "+" `ibuffer-marked-buffers-to-filter-group)
+	       (define-key ibuffer-mode-map "-" `ibuffer-toggle-all-filter-groups)
 	       (setq ibuffer-auto-mode 1))))
+
+(defun test-ibuffer ()
+  (ibuffer-mode)
+  (print "Hi"))
 
 (defun clear-shell ()
   (interactive)
@@ -72,8 +90,10 @@
 (tool-bar-mode -1)
 (menu-bar-mode -1)
 
+; ido mode. So necessary
 (ido-mode t)
-(global-set-key (kbd "C-x C-b") 'ibuffer-other-window)
+
+;(global-set-key (kbd "C-x C-b") 'ibuffer-other-window)
 ; Gtags
 (setq load-path (cons "/usr/local/share/gtags/" load-path))
 (autoload 'gtags-mode "gtags" "" t)
@@ -86,8 +106,8 @@
 
 
 ; Speedbar!
-(when window-system
-  (speedbar t))
+;(when window-system
+;  (speedbar t))
 
 ;(eval-after-load 'gtags-mode
 (global-set-key (kbd "C-c d") 'gtags-find-tag)
@@ -105,3 +125,4 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
+(put 'narrow-to-region 'disabled nil)
