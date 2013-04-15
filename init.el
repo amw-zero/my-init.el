@@ -11,12 +11,12 @@
 ;; (slime-setup)
 
 ; Multiple cursors
-(add-to-list 'load-path "multiple-cursors")
+(add-to-list 'load-path "~/.emacs.d/multiple-cursors")
 (require 'multiple-cursors)
 (global-set-key (kbd "C-c n") 'mc/mark-all-like-this)
 
 ;; Expand-region
-(add-to-list 'load-path "expand-region.el")
+(add-to-list 'load-path "~/.emacs.d/expand-region.el")
 (require 'expand-region)
 (global-set-key (kbd "C-=") 'er/expand-region)
 
