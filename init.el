@@ -11,14 +11,29 @@
 ;; (slime-setup)
 
 ; Multiple cursors
-(add-to-list 'load-path "~/.emacs.d/multiple-cursors")
-(require 'multiple-cursors)
-(global-set-key (kbd "C-c n") 'mc/mark-all-like-this)
+;; (add-to-list 'load-path "~/.emacs.d/multiple-cursors")
+;; (require 'multiple-cursors)
+;; (global-set-key (kbd "C-c n") 'mc/mark-all-like-this)
 
 ;; Expand-region
-(add-to-list 'load-path "~/.emacs.d/expand-region.el")
-(require 'expand-region)
-(global-set-key (kbd "C-=") 'er/expand-region)
+;; (add-to-list 'load-path "~/.emacs.d/expand-region.el")
+;; (require 'expand-region)
+;; (global-set-key (kbd "C-=") 'er/expand-region)
+
+
+(global-auto-revert-mode)
+(setq org-agenda-files (list "~/Org/work.org"
+			     "/Org/home.org"))
+(require 'org)
+(define-key global-map "\C-cl" 'org-store-link)
+(define-key global-map "\C-ca" 'org-agenda)
+(setq org-log-done t)
+
+(add-to-list 'load-path "~/.emacs.d/")
+(require 'rust-mode)
+(autoload 'rust-mode "rust-mode" nil t)
+(add-to-list 'auto-mode-alist '("\\.rs\\'" . rust-mode))
+
 
 ;;;; My Ibuffer extensions
 (setq ibuffer-show-empty-filter-groups nil)
@@ -121,7 +136,8 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(custom-enabled-themes (quote (tango-dark))))
+ '(custom-enabled-themes (quote (tango-dark)))
+ '(org-agenda-files (quote ("~/MuseAmi/CompletedWork/CompletedWork.org"))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
